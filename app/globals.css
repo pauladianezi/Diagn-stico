@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --red: #C0392B;
+  --dark: #1A1A1A;
+  --gray: #555555;
+  --lgray: #F4F4F4;
+  --mgray: #DEDEDE;
+  --dred: #7B1A1A;
+}
+
+body {
+  background-color: #F9F9F9;
+  color: #1A1A1A;
+  font-family: Arial, sans-serif;
+}
