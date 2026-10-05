@@ -78,6 +78,20 @@ export interface ReportContent {
     introducao: string;
     subsecoes: DiagnosisSubsection[];
   };
+  maturidade: {
+    nivel: 'Verde' | 'Rosé' | 'Grenah';
+    justificativa: string;
+  };
+  consideracoesFinais: {
+    paragrafos: string[];
+    trilha: {
+      servico: string;
+      nivel: 'Verde' | 'Rosé' | 'Grenah';
+      motivo: string;
+      entregaveis: string[];
+    }[];
+    proximosPassos: string;
+  };
 }
 
 export interface Diagnostic {

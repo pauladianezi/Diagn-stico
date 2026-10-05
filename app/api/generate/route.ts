@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { ClientAnswers, ResearchFindings, ReportContent } from "@/lib/types";
 import { generateDocx } from "@/lib/docx-generator";
+import { NIVEIS, Nivel, catalogoParaPrompt } from "@/lib/services";
 
 // Rede de segurança contra vícios de texto de IA que escapem do prompt
 function cleanText(s: string) {
@@ -98,12 +99,18 @@ ESTILO DE ESCRITA (proibições absolutas):
 - Não use negrito, markdown, asteriscos, emojis ou exclamações.
 - Escreva em português do Brasil, com acentuação correta.
 
-SERVIÇOS GRENAH disponíveis:
-- "Consultoria em Comunicação Estratégica": diagnóstico, planejamento, construção/reposicionamento de marca, gestão de mudanças
-- "Identidade e Fundação de Marca": manual de marca, logo, paleta, tipografia, narrativa visual
-- "Mentoria de Marca Pessoal": narrativa pessoal, tom de voz, posicionamento, conteúdo para LinkedIn
-- "Treinamentos Corporativos": Liderança Comunicadora, Storytelling, LinkedIn Estratégico para Lideranças
-- "Eventos, Rituais e Engajamento Cultural": eventos com propósito, rituais internos, ativações culturais
+NÍVEIS DE MATURIDADE DE COMUNICAÇÃO GRENAH:
+${(Object.keys(NIVEIS) as Nivel[]).map((n) => `- ${n} (${NIVEIS[n].lema}): ${NIVEIS[n].indicado}`).join("\n")}
+Classifique a marca em exatamente um nível, com base na evidência externa, e não na autodeclaração.
+
+ESTEIRA DE SERVIÇOS GRENAH (use exatamente estes nomes em servicoLabel e em trilha.servico):
+${catalogoParaPrompt()}
+
+TRILHA RECOMENDADA:
+- Comece pelos serviços do nível em que a marca está. Só inclua serviços de níveis acima se fizer sentido como próximo passo, deixando claro que vêm depois.
+- Entre 3 e 5 serviços, em ordem de prioridade lógica.
+- Em entregaveis, liste de 3 a 5 entregáveis do catálogo acima, escolhendo os mais relevantes para os problemas encontrados. Não invente entregáveis.
+- As considerações finais devem ser coerentes com o sumário, o plano de ação e o diagnóstico detalhado. Não introduza achados novos.
 
 Retorne APENAS o JSON válido, sem explicações:
 
@@ -183,12 +190,31 @@ Retorne APENAS o JSON válido, sem explicações:
         "servicoDesc": "..."
       }
     ]
+  },
+  "maturidade": {
+    "nivel": "Verde, Rosé ou Grenah",
+    "justificativa": "Por que a marca está neste nível, citando 2 ou 3 evidências concretas da pesquisa: 3-5 linhas"
+  },
+  "consideracoesFinais": {
+    "paragrafos": [
+      "Síntese do momento da marca e do que o diagnóstico revelou: 4-6 linhas",
+      "O que muda se a marca agir sobre os achados, e o que está em jogo se não agir: 3-5 linhas"
+    ],
+    "trilha": [
+      {
+        "servico": "Nome exato do serviço na esteira",
+        "nivel": "Nível do serviço na esteira",
+        "motivo": "Por que este serviço, ligado a um achado específico deste diagnóstico: 2-3 linhas",
+        "entregaveis": ["Entregável do catálogo", "Entregável do catálogo", "Entregável do catálogo"]
+      }
+    ],
+    "proximosPassos": "Como seguir a partir daqui: conversa de devolutiva, definição da trilha e início do primeiro serviço: 2-3 linhas"
   }
 }`;
 
   const message = await client.messages.create({
     model: "claude-opus-4-8",
-    max_tokens: 8192,
+    max_tokens: 16000,
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -218,4 +244,4 @@ Retorne APENAS o JSON válido, sem explicações:
   });
 }
 
-export const maxDuration = 120;
+export const maxDuration = 300;

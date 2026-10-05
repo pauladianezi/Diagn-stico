@@ -4,6 +4,7 @@ import {
   ShadingType, convertMillimetersToTwip, PageBreak,
 } from "docx";
 import { ClientAnswers, ReportContent, ActionItem } from "./types";
+import { NIVEIS, Nivel } from "./services";
 
 // Paleta oficial (Brand Design System Grenah)
 const GRENA = "AA1738";
@@ -165,6 +166,70 @@ function bodyPara(text: string) {
   });
 }
 
+function toNivel(n: string | undefined): Nivel {
+  const s = (n || "").toLowerCase();
+  if (s.startsWith("verde")) return "Verde";
+  if (s.startsWith("ros")) return "Rosé";
+  return "Grenah";
+}
+
+// Selo de maturidade: os três níveis lado a lado, com o nível da marca preenchido na cor dele
+function maturityBlock(nivelRaw: string, justificativa: string) {
+  const nivel = toNivel(nivelRaw);
+  const cells = (Object.keys(NIVEIS) as Nivel[]).map((n) => {
+    const active = n === nivel;
+    const fill = active ? NIVEIS[n].cor : WHITE;
+    const textColor = active && n === "Grenah" ? WHITE : DARK;
+    return new TableCell({
+      shading: { type: ShadingType.CLEAR, color: fill, fill },
+      borders: { top: { style: BorderStyle.SINGLE, size: 4, color: NIVEIS[n].cor }, bottom: { style: BorderStyle.SINGLE, size: 4, color: NIVEIS[n].cor }, left: { style: BorderStyle.SINGLE, size: 4, color: NIVEIS[n].cor }, right: { style: BorderStyle.SINGLE, size: 4, color: NIVEIS[n].cor } },
+      margins: { top: 140, bottom: 140, left: 160, right: 160 },
+      children: [
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [run(n, { font: SERIF, size: active ? 30 : 24, color: active ? textColor : GRAY })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [run(NIVEIS[n].lema, { size: 15, color: active ? textColor : GRAY })], spacing: { before: 40 } }),
+      ],
+    });
+  });
+  return [
+    new Paragraph({ children: [run("NÍVEL DE MATURIDADE DE COMUNICAÇÃO", { size: 14, color: GRENA, spacing: 40 })], spacing: { before: 120, after: 120 } }),
+    new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [new TableRow({ children: cells })] }),
+    new Paragraph({ children: [run(justificativa, { size: 19, color: GRAY })], spacing: { before: 140, line: 300 } }),
+  ];
+}
+
+function trilhaItem(t: ReportContent["consideracoesFinais"]["trilha"][number], i: number) {
+  const nivel = toNivel(t.nivel);
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: noTableBorders,
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: 120, type: WidthType.DXA },
+            shading: { type: ShadingType.CLEAR, color: NIVEIS[nivel].cor, fill: NIVEIS[nivel].cor },
+            borders: cellNoBorders,
+            children: [new Paragraph({ text: "" })],
+          }),
+          new TableCell({
+            borders: cellNoBorders,
+            margins: { top: 120, bottom: 160, left: 260, right: 120 },
+            children: [
+              new Paragraph({ children: [run(`${String(i + 1).padStart(2, "0")}   ${t.servico}`, { font: SERIF, size: 26 })] }),
+              new Paragraph({ children: [run(`NÍVEL ${nivel.toUpperCase()}`, { size: 13, color: GRENA, spacing: 40 })], spacing: { before: 40 } }),
+              new Paragraph({ children: [run(t.motivo, { size: 19 })], spacing: { before: 100, line: 300 } }),
+              new Paragraph({ children: [run("Entregáveis", { size: 16, color: GRAY, bold: true })], spacing: { before: 120 } }),
+              ...(t.entregaveis || []).map((e) =>
+                new Paragraph({ children: [run("●   ", { size: 12, color: GRENA }), run(e, { size: 18, color: GRAY })], indent: { left: 300, hanging: 300 }, spacing: { before: 40 } })
+              ),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
 function makeHeader(nomeCliente: string, mes: string) {
   return new Header({
     children: [
@@ -243,6 +308,7 @@ export async function generateDocx(answers: ClientAnswers, report: ReportContent
 
   const section01: (Paragraph | Table)[] = [
     ...sectionHeading("01", "Sumário executivo"),
+    ...(report.maturidade ? [...maturityBlock(report.maturidade.nivel, report.maturidade.justificativa), sp(240)] : []),
     callout(report.sumarioExecutivo.achado_critico, report.sumarioExecutivo.fonte_achado),
     sp(160),
     bodyPara(report.sumarioExecutivo.paragrafo1),
@@ -277,6 +343,31 @@ export async function generateDocx(answers: ClientAnswers, report: ReportContent
     ...subsecoes,
   ];
 
+  const cf = report.consideracoesFinais;
+  const section04: (Paragraph | Table)[] = cf
+    ? [
+        new Paragraph({ children: [new PageBreak()] }),
+        ...sectionHeading("04", "Considerações finais"),
+        ...(report.maturidade ? [new Paragraph({
+          children: [
+            run("Nível de maturidade: ", { size: 16, color: GRAY, spacing: 20 }),
+            run(toNivel(report.maturidade.nivel), { font: SERIF, size: 26, color: GRENA }),
+            run(`   ${NIVEIS[toNivel(report.maturidade.nivel)].lema}`, { size: 16, color: GRAY }),
+          ],
+          spacing: { after: 120 },
+        })] : []),
+        ...(cf.paragrafos || []).map(bodyPara),
+        subheading("Trilha de comunicação recomendada"),
+        new Paragraph({
+          children: [run("Os serviços estão em ordem de prioridade. A cor indica o nível de maturidade a que cada um pertence na esteira Grenah.", { size: 17, color: GRAY, italics: true })],
+          spacing: { after: 200 },
+        }),
+        ...(cf.trilha || []).flatMap((t, i) => [trilhaItem(t, i), sp(160)]),
+        subheading("Próximos passos"),
+        bodyPara(cf.proximosPassos),
+      ]
+    : [];
+
   const closing: (Paragraph | Table)[] = [
     new Paragraph({ children: [new PageBreak()] }),
     sp(2400),
@@ -306,7 +397,7 @@ export async function generateDocx(answers: ClientAnswers, report: ReportContent
         },
         headers: { default: makeHeader(answers.nomeEmpresa, mesAno) },
         footers: { default: makeFooter() },
-        children: [...makeCover(answers), ...section01, ...section02, ...section03, ...closing],
+        children: [...makeCover(answers), ...section01, ...section02, ...section03, ...section04, ...closing],
       },
     ],
   });
