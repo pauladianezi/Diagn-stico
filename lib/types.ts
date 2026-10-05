@@ -87,6 +87,8 @@ export interface Diagnostic {
   researchFindings: ResearchFindings;
   reportContent?: ReportContent;
   status: 'rascunho' | 'pesquisando' | 'revisando' | 'gerando' | 'pronto';
+  etapa?: 1 | 2 | 3 | 4;
+  atualizadoEm?: string;
 }
 
 export const emptyClientAnswers: ClientAnswers = {

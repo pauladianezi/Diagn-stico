@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ClientAnswers, ResearchFindings, ResearchSection } from "@/lib/types";
 
 interface Props {
@@ -27,6 +27,8 @@ const SECTIONS: {
   { key: "posts",     label: "Posts de Destaque",          icon: "📊", desc: "Anexe prints dos posts indicados como melhores",    mode: "images" },
   { key: "mercado",   label: "Cenário Competitivo",        icon: "🔍", desc: "Análise via busca automática",                      mode: "auto"   },
 ];
+
+const MAX_IMAGES = 15;
 
 async function compressImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -114,16 +116,41 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
     setSection(key, { conteudo: value, editado: true });
   }
 
-  function addImages(key: SectionKey, newFiles: FileList | null) {
+  // Ctrl+V cola o print na seção de imagens em que o usuário clicou ou passou o mouse por último
+  const [pasteTarget, setPasteTarget] = useState<SectionKey>("instagram");
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === "TEXTAREA" || el.tagName === "INPUT")) return;
+      const files = Array.from(e.clipboardData?.files || []).filter((f) => f.type.startsWith("image/"));
+      if (files.length === 0) return;
+      e.preventDefault();
+      addImages(pasteTarget, files);
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [pasteTarget]);
+
+  function addImages(key: SectionKey, newFiles: FileList | File[] | null) {
     if (!newFiles) return;
-    const arr = Array.from(newFiles).filter((f) => f.type.startsWith("image/"));
+    const arr = Array.from(newFiles)
+      .filter((f) => f.type.startsWith("image/"))
+      // Prints colados chegam todos como "image.png"; renomeia para distinguir
+      .map((f, i) => (f.name === "image.png" ? new File([f], `print-${Date.now()}-${i}.png`, { type: f.type }) : f));
+    setSectionImages((prev) => {
+      if ((prev[key]?.length || 0) + arr.length > MAX_IMAGES) {
+        setErrors((e) => ({ ...e, [key]: `Limite de ${MAX_IMAGES} imagens por seção. As excedentes foram ignoradas.` }));
+      }
+      return prev;
+    });
     setSectionImages((prev) => ({
       ...prev,
-      [key]: [...(prev[key] || []), ...arr].slice(0, 8),
+      [key]: [...(prev[key] || []), ...arr].slice(0, MAX_IMAGES),
     }));
   }
 
   function removeImage(key: SectionKey, idx: number) {
+    setErrors((e) => ({ ...e, [key]: "" }));
     setSectionImages((prev) => {
       const updated = [...(prev[key] || [])];
       updated.splice(idx, 1);
@@ -158,7 +185,13 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
           const imgs     = sectionImages[s.key] || [];
 
           return (
-            <div key={s.key} className="bg-white rounded-xl border" style={{ borderColor: "#DEDEDE" }}>
+            <div
+              key={s.key}
+              className="bg-white rounded-xl border"
+              style={{ borderColor: s.mode === "images" && pasteTarget === s.key ? "#F6BABC" : "#DEDEDE" }}
+              onMouseEnter={s.mode === "images" ? () => setPasteTarget(s.key) : undefined}
+              onClick={s.mode === "images" ? () => setPasteTarget(s.key) : undefined}
+            >
 
               {/* Header da seção */}
               <div className="p-4 flex items-start justify-between gap-3">
@@ -216,8 +249,8 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
                       onDrop={(e) => { e.preventDefault(); addImages(s.key, e.dataTransfer.files); }}
                     >
                       <span style={{ fontSize: 28, marginBottom: 6 }}>📎</span>
-                      <p style={{ color: "#555", fontSize: 13 }}>Clique ou arraste os prints aqui</p>
-                      <p style={{ color: "#AAA", fontSize: 12 }}>PNG, JPG • máximo 8 imagens</p>
+                      <p style={{ color: "#555", fontSize: 13 }}>Clique, arraste ou cole os prints aqui (Ctrl+V)</p>
+                      <p style={{ color: "#AAA", fontSize: 12 }}>PNG, JPG • até {MAX_IMAGES} imagens</p>
                     </div>
                   ) : (
                     <div className="mt-3">
@@ -239,7 +272,7 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
                             </button>
                           </div>
                         ))}
-                        {imgs.length < 8 && (
+                        {imgs.length < MAX_IMAGES && (
                           <div
                             className="w-20 h-20 rounded border-2 border-dashed flex items-center justify-center cursor-pointer"
                             style={{ borderColor: "#DEDEDE" }}
@@ -249,7 +282,8 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
                           </div>
                         )}
                       </div>
-                      <p style={{ fontSize: 12, color: "#888" }}>{imgs.length} print{imgs.length > 1 ? "s" : ""} • Clique em "Analisar prints" para enviar ao Claude</p>
+                      <p style={{ fontSize: 12, color: "#888" }}>{imgs.length} de {MAX_IMAGES} prints • Cole mais com Ctrl+V ou clique em "Analisar prints"</p>
+                      {!isError && errors[s.key] && <p style={{ fontSize: 12, color: "#AA1738", marginTop: 4 }}>{errors[s.key]}</p>}
                     </div>
                   )}
                 </div>

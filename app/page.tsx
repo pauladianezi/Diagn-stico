@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Diagnostic } from "@/lib/types";
+import { loadDiagnostics, deleteDiagnostic as removeDiagnostic, subscribeDiagnostics } from "@/lib/storage";
 
 export default function Home() {
   const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
@@ -11,11 +12,12 @@ export default function Home() {
   const [savedKey, setSavedKey] = useState("");
 
   useEffect(() => {
-    const stored = localStorage.getItem("grenah_diagnostics");
-    if (stored) setDiagnostics(JSON.parse(stored));
+    const refresh = () => setDiagnostics(loadDiagnostics());
+    refresh();
     const key = localStorage.getItem("grenah_api_key") || "";
     setSavedKey(key);
     if (!key) setShowKeyModal(true);
+    return subscribeDiagnostics(refresh);
   }, []);
 
   function saveKey() {
@@ -25,9 +27,7 @@ export default function Home() {
   }
 
   function deleteDiagnostic(id: string) {
-    const updated = diagnostics.filter((d) => d.id !== id);
-    setDiagnostics(updated);
-    localStorage.setItem("grenah_diagnostics", JSON.stringify(updated));
+    removeDiagnostic(id);
   }
 
   const statusLabel: Record<string, string> = {
