@@ -70,8 +70,8 @@ export default function Step1Upload({ onComplete, apiKey }: Props) {
 
   return (
     <div>
-      <h2 style={{ fontFamily: "Georgia, serif", fontSize: 24, color: "#1A1A1A", marginBottom: 8 }}>
-        Passo 1 — Upload do Questionário
+      <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, color: "#1A1A1A", marginBottom: 8 }}>
+        Passo 1. Upload do Questionário
       </h2>
       <p style={{ color: "#555", fontSize: 14, marginBottom: 32 }}>
         Envie o arquivo .docx preenchido pelo cliente. Claude extrairá automaticamente todas as respostas.
@@ -80,8 +80,8 @@ export default function Step1Upload({ onComplete, apiKey }: Props) {
       <div
         className="rounded-xl border-2 border-dashed flex flex-col items-center justify-center py-16 cursor-pointer transition-colors"
         style={{
-          borderColor: dragging ? "#C0392B" : "#DEDEDE",
-          backgroundColor: dragging ? "#FFF5F5" : "#FAFAFA",
+          borderColor: dragging ? "#AA1738" : "#DEDEDE",
+          backgroundColor: dragging ? "#FDF1F1" : "#FAFAFA",
         }}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
@@ -92,12 +92,12 @@ export default function Step1Upload({ onComplete, apiKey }: Props) {
 
         {loading ? (
           <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-4 rounded-full animate-spin" style={{ borderColor: "#DEDEDE", borderTopColor: "#C0392B" }} />
+            <div className="w-10 h-10 border-4 rounded-full animate-spin" style={{ borderColor: "#DEDEDE", borderTopColor: "#AA1738" }} />
             <p style={{ color: "#555", fontSize: 14 }}>{progress}</p>
           </div>
         ) : (
           <>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>📄</div>
+            <div style={{ fontFamily: "var(--font-serif)", fontSize: 22, letterSpacing: 2, color: "var(--grena)", marginBottom: 12 }}>.DOCX</div>
             <p style={{ color: "#1A1A1A", fontWeight: "bold", marginBottom: 4 }}>
               Arraste o .docx aqui ou clique para selecionar
             </p>
@@ -107,15 +107,15 @@ export default function Step1Upload({ onComplete, apiKey }: Props) {
       </div>
 
       {error && (
-        <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: "#FFF5F5", border: "1px solid #FFCCCC" }}>
-          <p style={{ color: "#C0392B", fontSize: 14 }}>{error}</p>
+        <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: "#FDF1F1", border: "1px solid #F6BABC" }}>
+          <p style={{ color: "#AA1738", fontSize: 14 }}>{error}</p>
         </div>
       )}
 
       {!apiKey && (
         <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: "#FFFBEB", border: "1px solid #FDE68A" }}>
           <p style={{ color: "#92400E", fontSize: 14 }}>
-            ⚠️ Chave de API não configurada. Volte ao painel e configure sua chave Anthropic antes de continuar.
+            Chave de API não configurada. Use o botão no rodapé do menu lateral para informar sua chave Anthropic.
           </p>
         </div>
       )}

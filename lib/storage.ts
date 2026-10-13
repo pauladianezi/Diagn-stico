@@ -2,6 +2,8 @@ import { Diagnostic } from "./types";
 
 const KEY = "grenah_diagnostics";
 export const CHANGE_EVENT = "grenah:diagnostics";
+export const API_KEY_STORAGE = "grenah_api_key";
+export const API_KEY_EVENT = "grenah:apikey";
 
 export function loadDiagnostics(): Diagnostic[] {
   try {

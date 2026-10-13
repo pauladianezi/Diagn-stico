@@ -68,8 +68,8 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
 
   return (
     <div>
-      <h2 style={{ fontFamily: "Georgia, serif", fontSize: 24, color: "#1A1A1A", marginBottom: 8 }}>
-        Passo 4 — Gerar Relatório
+      <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, color: "#1A1A1A", marginBottom: 8 }}>
+        Passo 4. Gerar Relatório
       </h2>
       <p style={{ color: "#555", fontSize: 14, marginBottom: 32 }}>
         Claude vai redigir todo o conteúdo do diagnóstico e montar o documento Word pronto para entrega.
@@ -77,7 +77,7 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
 
       {/* Resumo */}
       <div className="bg-white rounded-xl border p-6 mb-6" style={{ borderColor: "#DEDEDE" }}>
-        <h3 style={{ fontFamily: "Georgia, serif", fontSize: 18, color: "#1A1A1A", marginBottom: 16 }}>
+        <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: "#1A1A1A", marginBottom: 16 }}>
           Resumo do Diagnóstico
         </h3>
         <div className="grid grid-cols-2 gap-4">
@@ -88,8 +88,8 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
             ["Site", clientAnswers.urlSite],
           ].map(([label, value]) => (
             <div key={label}>
-              <p style={{ fontSize: 11, color: "#C0392B", fontWeight: "bold", letterSpacing: 1, textTransform: "uppercase" }}>{label}</p>
-              <p style={{ fontSize: 14, color: "#1A1A1A" }}>{value || "—"}</p>
+              <p style={{ fontSize: 11, color: "#AA1738", fontWeight: "bold", letterSpacing: 1, textTransform: "uppercase" }}>{label}</p>
+              <p style={{ fontSize: 14, color: "#1A1A1A" }}>{value || "Não informado"}</p>
             </div>
           ))}
         </div>
@@ -117,28 +117,28 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
       {!hasResearch && (
         <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#FFFBEB", border: "1px solid #FDE68A" }}>
           <p style={{ color: "#92400E", fontSize: 14 }}>
-            ⚠️ Nenhuma pesquisa externa foi realizada. O diagnóstico será baseado apenas nas respostas do questionário, sem análise externa.
+            Nenhuma pesquisa externa foi realizada. O diagnóstico será baseado apenas nas respostas do questionário, sem análise externa.
           </p>
         </div>
       )}
 
       {error && (
-        <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#FFF5F5", border: "1px solid #FFCCCC" }}>
-          <p style={{ color: "#C0392B", fontSize: 14 }}>{error}</p>
+        <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#FDF1F1", border: "1px solid #F6BABC" }}>
+          <p style={{ color: "#AA1738", fontSize: 14 }}>{error}</p>
         </div>
       )}
 
       {generated && (
         <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#ECFDF5", border: "1px solid #6EE7B7" }}>
           <p style={{ color: "#065F46", fontSize: 14 }}>
-            ✅ Diagnóstico gerado com sucesso! O arquivo foi baixado para o seu computador.
+            Diagnóstico gerado. O arquivo foi baixado para o seu computador.
           </p>
         </div>
       )}
 
       {loading && (
         <div className="mb-6 p-6 rounded-xl flex flex-col items-center gap-4" style={{ backgroundColor: "#F4F4F4" }}>
-          <div className="w-12 h-12 border-4 rounded-full animate-spin" style={{ borderColor: "#DEDEDE", borderTopColor: "#C0392B" }} />
+          <div className="w-12 h-12 border-4 rounded-full animate-spin" style={{ borderColor: "#DEDEDE", borderTopColor: "#AA1738" }} />
           <p style={{ color: "#555", fontSize: 14, textAlign: "center" }}>{progress}</p>
           <p style={{ color: "#888", fontSize: 13, textAlign: "center" }}>
             Este processo pode levar de 1 a 3 minutos. Por favor, não feche esta janela.
@@ -159,10 +159,10 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
           onClick={generate}
           disabled={loading}
           className="px-8 py-3 rounded text-white text-base font-medium cursor-pointer disabled:opacity-40 flex items-center gap-3"
-          style={{ backgroundColor: "#C0392B" }}
+          style={{ backgroundColor: "#AA1738" }}
         >
           {loading && <span className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: "#fff4", borderTopColor: "#fff" }} />}
-          {generated ? "↺ Gerar Novamente" : "📄 Gerar Diagnóstico .docx"}
+          {generated ? "↺ Gerar novamente" : "Gerar diagnóstico .docx"}
         </button>
       </div>
 

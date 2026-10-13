@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Diagnostic, ClientAnswers, ResearchFindings, emptyClientAnswers, emptyResearchFindings } from "@/lib/types";
-import { loadDiagnostics, saveDiagnostic } from "@/lib/storage";
+import { loadDiagnostics, saveDiagnostic, API_KEY_STORAGE, API_KEY_EVENT } from "@/lib/storage";
 import Step1Upload from "@/components/Step1Upload";
 import Step2Review from "@/components/Step2Review";
 import Step3Research from "@/components/Step3Research";
@@ -36,8 +36,15 @@ function NovoContent() {
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
 
+  // A chave pode ser salva pelo menu lateral com esta página já aberta
   useEffect(() => {
-    setApiKey(localStorage.getItem("grenah_api_key") || "");
+    const readKey = () => setApiKey(localStorage.getItem(API_KEY_STORAGE) || "");
+    readKey();
+    window.addEventListener(API_KEY_EVENT, readKey);
+    return () => window.removeEventListener(API_KEY_EVENT, readKey);
+  }, []);
+
+  useEffect(() => {
 
     // Sem id: cria um id e coloca na URL, para que recarregar a página retome o mesmo rascunho
     if (!id) {
@@ -90,7 +97,7 @@ function NovoContent() {
       {/* Header */}
       <header className="border-b bg-white" style={{ borderColor: "#DEDEDE" }}>
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <span style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#2B2B2B" }}>
+          <span style={{ fontFamily: "var(--font-serif)", fontSize: 20, color: "#2B2B2B" }}>
             {diagnostic.clientAnswers.nomeEmpresa || "Novo diagnóstico"}
           </span>
           <span style={{ color: "#888", fontSize: 12 }}>

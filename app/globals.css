@@ -2,17 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Paleta e tipografia do Brand Design System Grenah */
 :root {
-  --red: #C0392B;
-  --dark: #1A1A1A;
-  --gray: #555555;
-  --lgray: #F4F4F4;
-  --mgray: #DEDEDE;
-  --dred: #7B1A1A;
+  --grena: #AA1738;
+  --rose: #F6BABC;
+  --rose-bg: #FDF1F1;
+  --verde: #E2E9AE;
+  --dark: #2B2B2B;
+  --gray: #6B6B6B;
+  --line: #E6E6E6;
+  --font-serif: "Minion Variable Concept", "Minion Pro", var(--font-serif-web), Georgia, serif;
 }
 
 body {
-  background-color: #F9F9F9;
-  color: #1A1A1A;
-  font-family: Arial, sans-serif;
+  background-color: #FAF8F7;
+  color: var(--dark);
+  font-family: var(--font-sans), Arial, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--rose) !important;
+  box-shadow: 0 0 0 3px var(--rose-bg);
 }

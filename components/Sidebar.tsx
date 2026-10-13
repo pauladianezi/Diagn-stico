@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Diagnostic } from "@/lib/types";
-import { loadDiagnostics, subscribeDiagnostics } from "@/lib/storage";
+import { loadDiagnostics, subscribeDiagnostics, API_KEY_STORAGE, API_KEY_EVENT } from "@/lib/storage";
+import ApiKeyModal from "./ApiKeyModal";
 
 const STEP_LABEL: Record<number, string> = { 1: "Upload", 2: "Respostas", 3: "Pesquisa", 4: "Gerar relatório" };
 
@@ -47,20 +48,34 @@ export default function Sidebar() {
   const searchParams = useSearchParams();
   const activeId = pathname === "/novo" ? searchParams.get("id") : null;
 
+  const [hasKey, setHasKey] = useState(true);
+  const [showKeyModal, setShowKeyModal] = useState(false);
+
   useEffect(() => {
     const refresh = () => setDiagnostics(loadDiagnostics());
     refresh();
+    const key = localStorage.getItem(API_KEY_STORAGE) || "";
+    setHasKey(!!key);
+    if (!key) setShowKeyModal(true);
     return subscribeDiagnostics(refresh);
   }, []);
+
+  function saveKey(key: string) {
+    if (!key) return;
+    localStorage.setItem(API_KEY_STORAGE, key);
+    window.dispatchEvent(new Event(API_KEY_EVENT));
+    setHasKey(true);
+    setShowKeyModal(false);
+  }
 
   const rascunhos = diagnostics.filter((d) => d.status !== "pronto").sort(byRecent);
   const prontos = diagnostics.filter((d) => d.status === "pronto").sort(byRecent);
 
   return (
-    <aside className="w-64 shrink-0 h-screen sticky top-0 flex flex-col bg-white border-r" style={{ borderColor: "#E6E6E6" }}>
-      <Link href="/" className="px-5 pt-6 pb-5 block">
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: "#AA1738" }}>Grenah</div>
-        <div style={{ fontSize: 10, letterSpacing: 1.5, color: "#888" }}>DIAGNÓSTICO DE COMUNICAÇÃO</div>
+    <aside className="w-64 shrink-0 h-screen sticky top-0 flex flex-col bg-white border-r" style={{ borderColor: "var(--line)" }}>
+      <Link href="/" className="px-6 pt-7 pb-6 block">
+        <div style={{ fontFamily: "var(--font-serif)", fontSize: 30, lineHeight: 1, color: "var(--grena)" }}>Grenah</div>
+        <div style={{ fontSize: 8, letterSpacing: 1.3, whiteSpace: "nowrap", color: "var(--gray)", marginTop: 6 }}>ESTRATÉGIA, COMUNICAÇÃO & DESIGN</div>
       </Link>
       <div className="px-4 pb-5">
         <Link
@@ -75,6 +90,17 @@ export default function Sidebar() {
         <Group title="RASCUNHOS" items={rascunhos} activeId={activeId} empty="Nenhum rascunho." />
         <Group title="RELATÓRIOS" items={prontos} activeId={activeId} empty="Nenhum relatório concluído." />
       </nav>
+      <div className="px-4 py-4 border-t" style={{ borderColor: "var(--line)" }}>
+        <button
+          onClick={() => setShowKeyModal(true)}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-left cursor-pointer hover:bg-[#FDF1F1]"
+          style={{ fontSize: 13, color: "var(--gray)" }}
+        >
+          <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: hasKey ? "#9DB04A" : "var(--grena)" }} />
+          {hasKey ? "Chave de API configurada" : "Configurar chave de API"}
+        </button>
+      </div>
+      {showKeyModal && <ApiKeyModal hasKey={hasKey} onSave={saveKey} onClose={() => setShowKeyModal(false)} />}
     </aside>
   );
 }

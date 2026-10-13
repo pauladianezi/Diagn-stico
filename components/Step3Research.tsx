@@ -21,11 +21,11 @@ const SECTIONS: {
   desc: string;
   mode: "auto" | "images";
 }[] = [
-  { key: "site",      label: "Site e Proposta de Valor", icon: "🌐", desc: "Busca automática via Jina AI Reader",               mode: "auto"   },
-  { key: "instagram", label: "Instagram",                  icon: "📸", desc: "Anexe prints do perfil e do feed",                  mode: "images" },
-  { key: "linkedin",  label: "LinkedIn",                   icon: "💼", desc: "Anexe prints da página e de publicações",           mode: "images" },
-  { key: "posts",     label: "Posts de Destaque",          icon: "📊", desc: "Anexe prints dos posts indicados como melhores",    mode: "images" },
-  { key: "mercado",   label: "Cenário Competitivo",        icon: "🔍", desc: "Análise via busca automática",                      mode: "auto"   },
+  { key: "site",      label: "Site e Proposta de Valor", icon: "01", desc: "Busca automática via Jina AI Reader",               mode: "auto"   },
+  { key: "instagram", label: "Instagram",                  icon: "02", desc: "Anexe prints do perfil e do feed",                  mode: "images" },
+  { key: "linkedin",  label: "LinkedIn",                   icon: "03", desc: "Anexe prints da página e de publicações",           mode: "images" },
+  { key: "posts",     label: "Posts de Destaque",          icon: "04", desc: "Anexe prints dos posts indicados como melhores",    mode: "images" },
+  { key: "mercado",   label: "Cenário Competitivo",        icon: "05", desc: "Análise via busca automática",                      mode: "auto"   },
 ];
 
 const MAX_IMAGES = 15;
@@ -84,7 +84,7 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
       }
     }
 
-    // Route para mercado usa web_search (legado) — mantemos como auto sem imagens
+    // Route para mercado usa web_search (legado); mantemos como auto sem imagens
     if (sectionKey === "mercado") {
       images = [];
     }
@@ -164,15 +164,15 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
 
   return (
     <div>
-      <h2 style={{ fontFamily: "Georgia, serif", fontSize: 24, color: "#1A1A1A", marginBottom: 8 }}>
-        Passo 3 — Pesquisa Externa
+      <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, color: "#1A1A1A", marginBottom: 8 }}>
+        Passo 3. Pesquisa Externa
       </h2>
       <p style={{ color: "#555", fontSize: 14, marginBottom: 8 }}>
         Site e Cenário Competitivo são buscados automaticamente. Instagram, LinkedIn e Posts precisam dos prints.
       </p>
-      <div className="mb-6 p-3 rounded" style={{ backgroundColor: "#FFF5F5", border: "1px solid #FFCCCC" }}>
-        <p style={{ color: "#C0392B", fontSize: 13 }}>
-          <strong>Atenção:</strong> Complete ao menos uma seção antes de gerar o relatório. Cada análise pode levar até 30–60s.
+      <div className="mb-6 p-3 rounded" style={{ backgroundColor: "#FDF1F1", border: "1px solid #F6BABC" }}>
+        <p style={{ color: "#AA1738", fontSize: 13 }}>
+          <strong>Atenção:</strong> Complete ao menos uma seção antes de gerar o relatório. Cada análise pode levar de 30 a 60 segundos.
         </p>
       </div>
 
@@ -196,7 +196,7 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
               {/* Header da seção */}
               <div className="p-4 flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
-                  <span style={{ fontSize: 24 }}>{s.icon}</span>
+                  <span style={{ fontFamily: "var(--font-serif)", fontSize: 22, lineHeight: 1.1, color: "var(--grena)" }}>{s.icon}</span>
                   <div>
                     <h3 style={{ fontWeight: "bold", fontSize: 15, color: "#1A1A1A" }}>{s.label}</h3>
                     <p style={{ fontSize: 13, color: "#888" }}>{s.desc}</p>
@@ -209,7 +209,7 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
                   disabled={isLoading}
                   className="shrink-0 px-4 py-1.5 rounded text-sm font-medium cursor-pointer disabled:opacity-50 flex items-center gap-2"
                   style={{
-                    backgroundColor: isDone ? "#F4F4F4" : "#C0392B",
+                    backgroundColor: isDone ? "#F4F4F4" : "#AA1738",
                     color: isDone ? "#555" : "#fff",
                     border: isDone ? "1px solid #DEDEDE" : "none",
                   }}
@@ -248,7 +248,7 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={(e) => { e.preventDefault(); addImages(s.key, e.dataTransfer.files); }}
                     >
-                      <span style={{ fontSize: 28, marginBottom: 6 }}>📎</span>
+                      <span style={{ fontSize: 26, lineHeight: 1, color: "var(--grena)", marginBottom: 6 }}>+</span>
                       <p style={{ color: "#555", fontSize: 13 }}>Clique, arraste ou cole os prints aqui (Ctrl+V)</p>
                       <p style={{ color: "#AAA", fontSize: 12 }}>PNG, JPG • até {MAX_IMAGES} imagens</p>
                     </div>
@@ -266,7 +266,7 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
                             <button
                               onClick={() => removeImage(s.key, i)}
                               className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs cursor-pointer"
-                              style={{ backgroundColor: "#C0392B" }}
+                              style={{ backgroundColor: "#AA1738" }}
                             >
                               ×
                             </button>
@@ -293,7 +293,7 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
               {isLoading && (
                 <div className="px-4 pb-4 flex items-center gap-3" style={{ backgroundColor: "#FAFAFA", borderTop: "1px solid #F4F4F4" }}>
                   <div className="w-5 h-5 border-4 rounded-full animate-spin shrink-0"
-                    style={{ borderColor: "#DEDEDE", borderTopColor: "#C0392B" }} />
+                    style={{ borderColor: "#DEDEDE", borderTopColor: "#AA1738" }} />
                   <p style={{ color: "#555", fontSize: 13 }}>
                     {s.mode === "images" ? "Claude está analisando os prints..." : "Buscando e analisando o site..."}
                   </p>
@@ -302,12 +302,12 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
 
               {/* Erro */}
               {isError && errors[s.key] && (
-                <div className="px-4 pb-4" style={{ backgroundColor: "#FFF5F5", borderTop: "1px solid #FFCCCC" }}>
-                  <p style={{ color: "#C0392B", fontSize: 13, paddingTop: 12 }}>{errors[s.key]}</p>
+                <div className="px-4 pb-4" style={{ backgroundColor: "#FDF1F1", borderTop: "1px solid #F6BABC" }}>
+                  <p style={{ color: "#AA1738", fontSize: 13, paddingTop: 12 }}>{errors[s.key]}</p>
                   <textarea
                     rows={5}
                     className="mt-3 w-full rounded border p-3 text-sm"
-                    style={{ borderColor: "#DEDEDE", color: "#1A1A1A", fontFamily: "Arial, sans-serif" }}
+                    style={{ borderColor: "#DEDEDE", color: "#1A1A1A", fontFamily: "inherit" }}
                     placeholder="Ou adicione os achados manualmente..."
                     value={section.conteudo}
                     onChange={(e) => updateContent(s.key, e.target.value)}
@@ -319,12 +319,12 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
               {isDone && !isLoading && (
                 <div className="px-4 pb-4" style={{ borderTop: "1px solid #DEDEDE" }}>
                   <p style={{ fontSize: 12, color: "#888", paddingTop: 10, marginBottom: 6 }}>
-                    {section.editado ? "✏️ Editado manualmente" : "✅ Gerado pelo Claude — edite se necessário"}
+                    {section.editado ? "Editado manualmente" : "Gerado pelo Claude. Edite se necessário."}
                   </p>
                   <textarea
                     rows={10}
                     className="w-full rounded border p-3 text-sm"
-                    style={{ borderColor: "#DEDEDE", color: "#1A1A1A", fontFamily: "Arial, sans-serif", resize: "vertical" }}
+                    style={{ borderColor: "#DEDEDE", color: "#1A1A1A", fontFamily: "inherit", resize: "vertical" }}
                     value={section.conteudo}
                     onChange={(e) => updateContent(s.key, e.target.value)}
                   />
@@ -337,15 +337,15 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
         {/* Notas adicionais */}
         <div className="bg-white rounded-xl border p-4" style={{ borderColor: "#DEDEDE" }}>
           <h3 style={{ fontWeight: "bold", fontSize: 15, color: "#1A1A1A", marginBottom: 4 }}>
-            📝 Notas Adicionais
+            Notas adicionais
           </h3>
           <p style={{ fontSize: 13, color: "#888", marginBottom: 8 }}>
-            Observações que não vieram da análise automática — contexto de reunião, impressões subjetivas, etc.
+            Observações que não vieram da análise automática: contexto de reunião, impressões subjetivas, etc.
           </p>
           <textarea
             rows={4}
             className="w-full rounded border p-3 text-sm"
-            style={{ borderColor: "#DEDEDE", color: "#1A1A1A", fontFamily: "Arial, sans-serif" }}
+            style={{ borderColor: "#DEDEDE", color: "#1A1A1A", fontFamily: "inherit" }}
             placeholder="Ex: Cliente mencionou em reunião que está lançando um produto novo em julho..."
             value={findings.notasAdicionais}
             onChange={(e) => onChange({ ...findings, notasAdicionais: e.target.value })}
@@ -364,7 +364,7 @@ export default function Step3Research({ clientAnswers, findings, onChange, onNex
         <button
           onClick={onNext}
           className="px-8 py-2.5 rounded text-white text-sm font-medium cursor-pointer"
-          style={{ backgroundColor: anyData ? "#C0392B" : "#AAAAAA" }}
+          style={{ backgroundColor: anyData ? "#AA1738" : "#AAAAAA" }}
         >
           Gerar Relatório →
         </button>
