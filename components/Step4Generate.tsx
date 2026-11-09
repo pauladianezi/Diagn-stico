@@ -29,8 +29,9 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || "Erro ao gerar o relatório.");
+        let data: { error?: string } = {};
+        try { data = await res.json(); } catch { /* sem JSON */ }
+        setError(data.error || `O servidor não respondeu corretamente (erro ${res.status}). Tente novamente.`);
         setLoading(false);
         return;
       }

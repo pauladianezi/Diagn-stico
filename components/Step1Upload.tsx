@@ -35,15 +35,16 @@ export default function Step1Upload({ onComplete, apiKey }: Props) {
         body: formData,
       });
 
-      const data = await res.json();
+      let data: { error?: string; answers?: ClientAnswers; rawText?: string } = {};
+      try { data = await res.json(); } catch { /* resposta sem JSON */ }
 
       if (!res.ok) {
-        setError(data.error || "Erro ao processar o arquivo.");
+        setError(data.error || `O servidor não respondeu corretamente (erro ${res.status}). Tente novamente em instantes.`);
         setLoading(false);
         return;
       }
 
-      onComplete(data.answers, data.rawText);
+      onComplete(data.answers as ClientAnswers, data.rawText || "");
     } catch (e) {
       setError("Erro de conexão. Verifique sua internet e tente novamente.");
     } finally {

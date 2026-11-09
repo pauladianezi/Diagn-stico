@@ -107,7 +107,7 @@ function detectMediaType(base64: string): AnthropicMediaType {
 
 // ── Route handler ────────────────────────────────────────────────────────────
 
-export async function POST(req: NextRequest) {
+async function handle(req: NextRequest) {
   const apiKey = req.headers.get("x-api-key") || process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "ANTHROPIC_API_KEY não configurada." }, { status: 400 });
@@ -213,3 +213,21 @@ export async function POST(req: NextRequest) {
 }
 
 export const maxDuration = 60;
+
+function friendlyError(e: unknown): string {
+  const err = e as { status?: number; message?: string };
+  if (err?.status === 401) return 'Chave de API inválida. Clique em "Chave de API" no menu lateral e confira a chave.';
+  if (err?.status === 400 && /credit|balance/i.test(err.message || "")) return "Sem crédito na conta da Anthropic. Adicione crédito em console.anthropic.com.";
+  if (err?.status === 404) return "Modelo do Claude indisponível para esta chave.";
+  if (err?.status === 429) return "Limite de uso da API atingido. Aguarde um minuto e tente de novo.";
+  return `Erro: ${err?.message || "falha desconhecida"}`;
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    return await handle(req);
+  } catch (e) {
+    console.error("$f error", e);
+    return NextResponse.json({ error: friendlyError(e) }, { status: 500 });
+  }
+}
