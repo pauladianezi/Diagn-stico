@@ -4,7 +4,7 @@ import {
   ShadingType, convertMillimetersToTwip, PageBreak,
 } from "docx";
 import { ClientAnswers, ReportContent, ActionItem } from "./types";
-import { NIVEIS, Nivel } from "./services";
+import { NIVEIS, Nivel, toNivel } from "./services";
 
 // Paleta oficial (Brand Design System Grenah)
 const GRENA = "AA1738";
@@ -164,13 +164,6 @@ function bodyPara(text: string) {
     children: [run(text)],
     spacing: { before: 120, line: 320 },
   });
-}
-
-function toNivel(n: string | undefined): Nivel {
-  const s = (n || "").toLowerCase();
-  if (s.startsWith("verde")) return "Verde";
-  if (s.startsWith("ros")) return "Rosé";
-  return "Grenah";
 }
 
 // Selo de maturidade: os três níveis lado a lado, com o nível da marca preenchido na cor dele

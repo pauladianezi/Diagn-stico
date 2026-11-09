@@ -1,21 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { ClientAnswers, ResearchFindings } from "@/lib/types";
+import { ClientAnswers, ResearchFindings, ReportContent } from "@/lib/types";
 
 interface Props {
   clientAnswers: ClientAnswers;
   researchFindings: ResearchFindings;
   onBack: () => void;
-  onComplete: () => void;
+  onGenerated: (report: ReportContent) => void;
   apiKey: string;
 }
 
-export default function Step4Generate({ clientAnswers, researchFindings, onBack, onComplete, apiKey }: Props) {
+export default function Step4Generate({ clientAnswers, researchFindings, onBack, onGenerated, apiKey }: Props) {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
-  const [generated, setGenerated] = useState(false);
 
   async function generate() {
     setLoading(true);
@@ -36,24 +35,8 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
         return;
       }
 
-      setProgress("Montando o documento Word...");
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-
-      const contentDisposition = res.headers.get("Content-Disposition") || "";
-      const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-      a.download = filenameMatch ? filenameMatch[1] : `Grenah_Diagnostico_${clientAnswers.nomeEmpresa}.docx`;
-
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      setGenerated(true);
-      onComplete();
+      const data = await res.json();
+      onGenerated(data.report);
     } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
@@ -72,7 +55,7 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
         Passo 4. Gerar Relatório
       </h2>
       <p style={{ color: "#555", fontSize: 14, marginBottom: 32 }}>
-        Claude vai redigir todo o conteúdo do diagnóstico e montar o documento Word pronto para entrega.
+        Claude vai redigir todo o conteúdo do diagnóstico. Depois você revisa e edita o relatório na tela, e baixa em PDF ou Word.
       </p>
 
       {/* Resumo */}
@@ -128,14 +111,6 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
         </div>
       )}
 
-      {generated && (
-        <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#ECFDF5", border: "1px solid #6EE7B7" }}>
-          <p style={{ color: "#065F46", fontSize: 14 }}>
-            Diagnóstico gerado. O arquivo foi baixado para o seu computador.
-          </p>
-        </div>
-      )}
-
       {loading && (
         <div className="mb-6 p-6 rounded-xl flex flex-col items-center gap-4" style={{ backgroundColor: "#F4F4F4" }}>
           <div className="w-12 h-12 border-4 rounded-full animate-spin" style={{ borderColor: "#DEDEDE", borderTopColor: "#AA1738" }} />
@@ -162,12 +137,12 @@ export default function Step4Generate({ clientAnswers, researchFindings, onBack,
           style={{ backgroundColor: "#AA1738" }}
         >
           {loading && <span className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: "#fff4", borderTopColor: "#fff" }} />}
-          {generated ? "↺ Gerar novamente" : "Gerar diagnóstico .docx"}
+          Gerar relatório
         </button>
       </div>
 
       <p style={{ fontSize: 12, color: "#888", textAlign: "center", marginTop: 12 }}>
-        O arquivo será baixado automaticamente ao final do processo.
+        Ao final, o relatório abre na tela para revisão e edição.
       </p>
     </div>
   );

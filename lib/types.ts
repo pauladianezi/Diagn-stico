@@ -102,6 +102,7 @@ export interface Diagnostic {
   reportContent?: ReportContent;
   status: 'rascunho' | 'pesquisando' | 'revisando' | 'gerando' | 'pronto';
   etapa?: 1 | 2 | 3 | 4;
+  geradoEm?: string;
   atualizadoEm?: string;
 }
 

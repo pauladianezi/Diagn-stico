@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { ClientAnswers, ResearchFindings, ReportContent } from "@/lib/types";
-import { generateDocx } from "@/lib/docx-generator";
 import { NIVEIS, Nivel, catalogoParaPrompt } from "@/lib/services";
 
 // Rede de segurança contra vícios de texto de IA que escapem do prompt
@@ -232,16 +231,7 @@ Retorne APENAS o JSON válido, sem explicações:
     return NextResponse.json({ error: "Erro ao parsear conteúdo do relatório.", raw: content.text }, { status: 500 });
   }
 
-  const docxBuffer = await generateDocx(clientAnswers, reportContent);
-
-  const nomeArquivo = `Grenah_Diagnostico_${clientAnswers.nomeEmpresa.replace(/\s+/g, "")}_${new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" }).replace(" de ", "")}.docx`;
-
-  return new NextResponse(docxBuffer as unknown as BodyInit, {
-    headers: {
-      "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "Content-Disposition": `attachment; filename="${nomeArquivo.normalize("NFD").replace(/[^\x20-\x7E]/g, "")}"; filename*=UTF-8''${encodeURIComponent(nomeArquivo)}`,
-    },
-  });
+  return NextResponse.json({ report: reportContent });
 }
 
 export const maxDuration = 300;

@@ -20,6 +20,14 @@ export const NIVEIS: Record<Nivel, { cor: string; lema: string; indicado: string
   },
 };
 
+// O modelo pode escrever "Rose", "rosé" ou "Rosé"; normaliza para um dos três níveis
+export function toNivel(n: string | undefined): Nivel {
+  const s = (n || "").toLowerCase();
+  if (s.startsWith("verde")) return "Verde";
+  if (s.startsWith("ros")) return "Rosé";
+  return "Grenah";
+}
+
 export const SERVICOS: { nome: string; nivel: Nivel; entregaveis: string }[] = [
   { nivel: "Verde", nome: "Modelo de Negócio", entregaveis: "Canvas de modelo de negócio, análise da proposta de valor, mapeamento de públicos e segmentos, fontes de receita, diferenciais competitivos, oportunidades de crescimento, recomendações para posicionamento e comunicação" },
   { nivel: "Verde", nome: "Posicionamento Verbal", entregaveis: "Imersão estratégica, essência da marca, declaração de posicionamento, proposta de valor única, promessa da marca, personalidade e arquétipos, tom de voz e mensagens-chave" },

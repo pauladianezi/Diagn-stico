@@ -75,7 +75,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Link
-                    href={`/novo?id=${d.id}`}
+                    href={d.reportContent ? `/relatorio?id=${d.id}` : `/novo?id=${d.id}`}
                     className="px-4 py-1.5 rounded-md text-sm border"
                     style={{ borderColor: "var(--grena)", color: "var(--grena)" }}
                   >

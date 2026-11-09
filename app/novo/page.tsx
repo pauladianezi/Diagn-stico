@@ -170,7 +170,10 @@ function NovoContent() {
             clientAnswers={diagnostic.clientAnswers}
             researchFindings={diagnostic.researchFindings}
             onBack={() => update({ etapa: 3 })}
-            onComplete={() => update({ status: "pronto" })}
+            onGenerated={(reportContent) => {
+              update({ reportContent, geradoEm: new Date().toISOString(), status: "pronto" });
+              router.push(`/relatorio?id=${diagnostic.id}`);
+            }}
             apiKey={apiKey}
           />
         )}

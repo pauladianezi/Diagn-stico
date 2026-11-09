@@ -18,7 +18,7 @@ function Item({ d, active }: { d: Diagnostic; active: boolean }) {
   const detail = d.status === "pronto" ? date : `${STEP_LABEL[d.etapa || 2]} · ${date}`;
   return (
     <Link
-      href={`/novo?id=${d.id}`}
+      href={d.reportContent ? `/relatorio?id=${d.id}` : `/novo?id=${d.id}`}
       className="block rounded-md px-3 py-2 transition-colors hover:bg-[#FDF1F1]"
       style={{ backgroundColor: active ? "#FDF1F1" : undefined, borderLeft: `3px solid ${active ? "#AA1738" : "transparent"}` }}
     >
@@ -46,7 +46,7 @@ export default function Sidebar() {
   const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const activeId = pathname === "/novo" ? searchParams.get("id") : null;
+  const activeId = (pathname === "/novo" || pathname === "/relatorio") ? searchParams.get("id") : null;
 
   const [hasKey, setHasKey] = useState(true);
   const [showKeyModal, setShowKeyModal] = useState(false);
